@@ -57,7 +57,6 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public ClienteDto guardarCliente(ClienteDto clienteDto) {
         log.warm("Guardando cliente");
-        validarCliente(clienteDto);
         Cliente cliente = GenericMapper.map(clienteDto,Cliente.class);
         Cliente clienteGuardado = clienteRepository.save(cliente);
         return GenericMapper.map(clienteGuardado,ClienteDto.class);
@@ -66,16 +65,9 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public ClienteDto actualizarCliente(ClienteDto clienteDto) {
         log.info("Actualizando cliente", clienteDto.getId().toString());
-        validarCliente(clienteDto);
         Optional<Cliente> clienteOptional = clienteRepository.findById(clienteDto.getId());
         if(clienteOptional.isPresent()) {
-            Cliente cliente = clienteOptional.get();
-            cliente.setShared(clienteDto.getShared());
-            cliente.setNombre(clienteDto.getNombre());
-            cliente.setTelefono(clienteDto.getTelefono());
-            cliente.setEmail(clienteDto.getEmail());
-            cliente.setInicio(clienteDto.getInicio());
-            cliente.setFin(clienteDto.getFin());
+            Cliente cliente = GenericMapper.map(clienteDto, Cliente.class);
             Cliente clienteActualizado = clienteRepository.save(cliente);
             log.info("Cliente actualizado exitosamente");
             return GenericMapper.map(clienteActualizado,ClienteDto.class);
@@ -83,35 +75,6 @@ public class ClienteServiceImpl implements ClienteService {
         String mensajeError = ExceptionMessages.ERROR203.getMensajeConParametros();
         log.error(mensajeError);
         throw new ResponseStatusException(HttpStatus.CONFLICT, mensajeError);
-    }
-
-    private void validarCliente(ClienteDto clienteDto){
-        Set<ConstraintViolation<ClienteDto>> violations = validator.validate(clienteDto);
-        if (!violations.isEmpty()) {
-            String errorMessage = violations.stream()
-                    .map(ConstraintViolation::getMessage)
-                    .collect(Collectors.joining("; "));
-            log.warm(errorMessage);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
-        }
-
-        Optional<Cliente> clienteByEmail = clienteRepository.findByEmail(clienteDto.getEmail());
-        clienteByEmail.ifPresent(c -> {
-            if (!c.getId().equals(clienteDto.getId())) {
-                String mensajeError = ExceptionMessages.ERROR202.getMensajeConParametros(clienteDto.getEmail());
-                log.warm(mensajeError);
-                throw new ResponseStatusException(HttpStatus.CONFLICT, mensajeError);
-            }
-        });
-
-        Optional<Cliente> clienteBySharedKey = clienteRepository.findOneByShared(clienteDto.getShared());
-        clienteBySharedKey.ifPresent(c -> {
-            if (!c.getId().equals(clienteDto.getId())) {
-                String mensajeError = ExceptionMessages.ERROR201.getMensajeConParametros(clienteDto.getShared());
-                log.warm(mensajeError);
-                throw new ResponseStatusException(HttpStatus.CONFLICT, mensajeError);
-            }
-        });
     }
 
 }
