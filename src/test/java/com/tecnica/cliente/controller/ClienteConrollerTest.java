@@ -56,7 +56,7 @@ public class ClienteConrollerTest {
         String sharedKey = "sh1";
         ClienteDto clienteDto = new ClienteDto();
         clienteDto.setId(1L);
-        clienteDto.setSharedKey(sharedKey);
+        clienteDto.setShared(sharedKey);
 
         when(clienteService.obtenetClientePorSharedKey(sharedKey)).thenReturn(clienteDto);
 
@@ -77,7 +77,7 @@ public class ClienteConrollerTest {
     void testCrearCliente() throws Exception {
         ClienteDto clienteDto = new ClienteDto();
         clienteDto.setId(2L);
-        clienteDto.setSharedKey("123456");
+        clienteDto.setShared("123456");
         clienteDto.setNombre("John Doe");
         clienteDto.setEmail("johndoe@example.com");
 
@@ -105,7 +105,7 @@ public class ClienteConrollerTest {
     void testActualizarCliente() throws Exception {
         ClienteDto clienteDto = new ClienteDto();
         clienteDto.setId(1L);
-        clienteDto.setSharedKey("sh1");
+        clienteDto.setShared("sh1");
         clienteDto.setNombre("admin");
         clienteDto.setEmail("mail@gmail.com");
 

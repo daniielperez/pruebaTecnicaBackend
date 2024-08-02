@@ -82,12 +82,12 @@ public class ClienteServiceTest {
     @Test
     public void testGuardarClienteExitosamente() {
         ClienteDto clienteDto = new ClienteDto();
-        clienteDto.setSharedKey("123456");
+        clienteDto.setShared("123456");
         clienteDto.setNombre("David Perez");
         clienteDto.setTelefono("3178954373");
         clienteDto.setEmail("david@gmail.com");
-        clienteDto.setFechaInicio(new Date());
-        clienteDto.setFechaFin(new Date());
+        clienteDto.setInicio(new Date());
+        clienteDto.setFin(new Date());
 
         Cliente cliente = new Cliente();
         cliente.setId(1L);
@@ -102,7 +102,7 @@ public class ClienteServiceTest {
 
         assertEquals("David Perez", resultado.getNombre());
         assertEquals("david@gmail.com", resultado.getEmail());
-        assertEquals("123456", resultado.getSharedKey());
+        assertEquals("123456", resultado.getShared());
     }
 
     @Test
@@ -111,9 +111,9 @@ public class ClienteServiceTest {
         clienteDto.setEmail("existente@example.com");
         clienteDto.setNombre("Nombre");
         clienteDto.setTelefono("3046613922");
-        clienteDto.setSharedKey("sharedKey");
-        clienteDto.setFechaInicio(new Date());
-        clienteDto.setFechaFin(new Date());
+        clienteDto.setShared("sharedKey");
+        clienteDto.setInicio(new Date());
+        clienteDto.setFin(new Date());
         Cliente clienteExistente = new Cliente();
         clienteExistente.setId(2L);
         when(clienteRepository.findByEmail(anyString())).thenReturn(Optional.of(clienteExistente));
@@ -126,9 +126,9 @@ public class ClienteServiceTest {
         clienteDto.setEmail("nuevo@example.com");
         clienteDto.setNombre("Nombre");
         clienteDto.setTelefono("3046613922");
-        clienteDto.setSharedKey("sharedKeyExistente");
-        clienteDto.setFechaInicio(new Date());
-        clienteDto.setFechaFin(new Date());
+        clienteDto.setShared("sharedKeyExistente");
+        clienteDto.setInicio(new Date());
+        clienteDto.setFin(new Date());
         Cliente clienteExistente = new Cliente();
         clienteExistente.setId(2L);
         when(clienteRepository.findOneByShared(anyString())).thenReturn(Optional.of(clienteExistente));
@@ -138,12 +138,12 @@ public class ClienteServiceTest {
     @Test
     public void testGuardarClienteConDatosInvalidos() {
         ClienteDto clienteInvalido = new ClienteDto();
-        clienteInvalido.setSharedKey("");
+        clienteInvalido.setShared("");
         clienteInvalido.setNombre("");
         clienteInvalido.setTelefono("");
         clienteInvalido.setEmail("");
-        clienteInvalido.setFechaInicio(null);
-        clienteInvalido.setFechaFin(null);
+        clienteInvalido.setInicio(null);
+        clienteInvalido.setFin(null);
         ResponseStatusException thrown = assertThrows(
                 ResponseStatusException.class,
                 () -> clienteService.guardarCliente(clienteInvalido),
@@ -156,12 +156,12 @@ public class ClienteServiceTest {
     public void testActualizarClienteExitosamente() {
         ClienteDto clienteDto = new ClienteDto();
         clienteDto.setId(1L);
-        clienteDto.setSharedKey("sharedKEy");
+        clienteDto.setShared("sharedKEy");
         clienteDto.setNombre("Nombre Nuevo");
         clienteDto.setTelefono("4317829292");
         clienteDto.setEmail("email@nuevo.com");
-        clienteDto.setFechaInicio(new Date());
-        clienteDto.setFechaFin(new Date());
+        clienteDto.setInicio(new Date());
+        clienteDto.setFin(new Date());
         Cliente clienteExistente = new Cliente();
         when(clienteRepository.findById(1L)).thenReturn(Optional.of(clienteExistente));
         when(clienteRepository.save(any(Cliente.class))).thenAnswer(i -> i.getArguments()[0]);
@@ -173,12 +173,12 @@ public class ClienteServiceTest {
     public void testActualizarClienteNoEncontrado() {
         ClienteDto clienteDto = new ClienteDto();
         clienteDto.setId(999L);
-        clienteDto.setSharedKey("sharedKey");
+        clienteDto.setShared("sharedKey");
         clienteDto.setNombre("Nombre Nuevo");
         clienteDto.setTelefono("4317829292");
         clienteDto.setEmail("email@nuevo.com");
-        clienteDto.setFechaInicio(new Date());
-        clienteDto.setFechaFin(new Date());
+        clienteDto.setInicio(new Date());
+        clienteDto.setFin(new Date());
         when(clienteRepository.findById(999L)).thenReturn(Optional.empty());
         ResponseStatusException thrown = assertThrows(
                 ResponseStatusException.class,

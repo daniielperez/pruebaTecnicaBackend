@@ -12,12 +12,12 @@ import java.util.Date;
 @Builder
 public class ClienteDto {
     private Long id;
-    private String sharedKey;
+    private String shared;
     @NotBlank(message = "El nombre no puede estar vacío")
     private String nombre;
     private String telefono;
     @Email(message = "El email debe ser válido")
     private String email;
-    private Date fechaInicio;
-    private Date fechaFin;
+    private Date inicio;
+    private Date fin;
 }

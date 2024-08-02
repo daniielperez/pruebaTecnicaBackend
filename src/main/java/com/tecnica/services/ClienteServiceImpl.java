@@ -3,6 +3,7 @@ package com.tecnica.services;
 import com.tecnica.dto.ClienteDto;
 import com.tecnica.entity.Cliente;
 import com.tecnica.manager.Log;
+import com.tecnica.mapper.GenericMapper;
 import com.tecnica.messages.ExceptionMessages;
 import com.tecnica.repository.ClienteRepository;
 import jakarta.validation.ConstraintViolation;
@@ -28,12 +29,12 @@ public class ClienteServiceImpl implements ClienteService {
     @Autowired
     private Log log;
 
+
+
     @Override
     public List<ClienteDto> obtenerTodosLosCliente() {
         log.warm("Buscando listado de clientes");
-        List<ClienteDto> clienteDtoList = clienteRepository.findAll().stream()
-                .map(this::clienteDtoToCliente)
-                .collect(Collectors.toList());
+        List<ClienteDto> clienteDtoList = GenericMapper.mapList(clienteRepository.findAll(),ClienteDto.class);
         return clienteDtoList;
     }
 
@@ -41,7 +42,7 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteDto obtenetClientePorSharedKey(String sharedKey) {
         log.warm("Buscando cliente por shared key");
         Cliente cli = clienteRepository.findOneByShared(sharedKey).orElse(null);
-        ClienteDto cliDto = cli != null ? clienteDtoToCliente(cli) : null;
+        ClienteDto cliDto = cli != null ? GenericMapper.map(cli,ClienteDto.class) : null;
         return cliDto;
     }
 
@@ -49,7 +50,7 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteDto obtenetClientePorEmail(String email) {
         log.warm("Buscando cliente por email");
         Cliente cli = clienteRepository.findByEmail(email).orElse(null);
-        ClienteDto cliDto = cli != null ? clienteDtoToCliente(cli) : null;
+        ClienteDto cliDto = cli != null ? GenericMapper.map(cli,ClienteDto.class) : null;
         return cliDto;
     }
 
@@ -57,9 +58,9 @@ public class ClienteServiceImpl implements ClienteService {
     public ClienteDto guardarCliente(ClienteDto clienteDto) {
         log.warm("Guardando cliente");
         validarCliente(clienteDto);
-        Cliente cliente = clienteToClienteDto(clienteDto);
+        Cliente cliente = GenericMapper.map(clienteDto,Cliente.class);
         Cliente clienteGuardado = clienteRepository.save(cliente);
-        return clienteDtoToCliente(clienteGuardado);
+        return GenericMapper.map(clienteGuardado,ClienteDto.class);
     }
 
     @Override
@@ -69,43 +70,19 @@ public class ClienteServiceImpl implements ClienteService {
         Optional<Cliente> clienteOptional = clienteRepository.findById(clienteDto.getId());
         if(clienteOptional.isPresent()) {
             Cliente cliente = clienteOptional.get();
-            cliente.setShared(clienteDto.getSharedKey());
+            cliente.setShared(clienteDto.getShared());
             cliente.setNombre(clienteDto.getNombre());
             cliente.setTelefono(clienteDto.getTelefono());
             cliente.setEmail(clienteDto.getEmail());
-            cliente.setInicio(clienteDto.getFechaInicio());
-            cliente.setFin(clienteDto.getFechaFin());
+            cliente.setInicio(clienteDto.getInicio());
+            cliente.setFin(clienteDto.getFin());
             Cliente clienteActualizado = clienteRepository.save(cliente);
             log.info("Cliente actualizado exitosamente");
-            return clienteDtoToCliente(clienteActualizado);
+            return GenericMapper.map(clienteActualizado,ClienteDto.class);
         }
         String mensajeError = ExceptionMessages.ERROR203.getMensajeConParametros();
         log.error(mensajeError);
         throw new ResponseStatusException(HttpStatus.CONFLICT, mensajeError);
-    }
-
-    private Cliente clienteToClienteDto(ClienteDto clienteDto){
-        Cliente cliente =  Cliente.builder()
-                .shared(clienteDto.getSharedKey())
-                .telefono(clienteDto.getTelefono())
-                .nombre(clienteDto.getNombre())
-                .email(clienteDto.getEmail())
-                .inicio(clienteDto.getFechaInicio())
-                .fin(clienteDto.getFechaFin())
-                .build();
-        return cliente;
-    }
-
-    private ClienteDto clienteDtoToCliente(Cliente cliente) {
-        return ClienteDto.builder()
-                .id(cliente.getId())
-                .sharedKey(cliente.getShared())
-                .nombre(cliente.getNombre())
-                .telefono(cliente.getTelefono())
-                .email(cliente.getEmail())
-                .fechaInicio(cliente.getInicio())
-                .fechaFin(cliente.getFin())
-                .build();
     }
 
     private void validarCliente(ClienteDto clienteDto){
@@ -127,10 +104,10 @@ public class ClienteServiceImpl implements ClienteService {
             }
         });
 
-        Optional<Cliente> clienteBySharedKey = clienteRepository.findOneByShared(clienteDto.getSharedKey());
+        Optional<Cliente> clienteBySharedKey = clienteRepository.findOneByShared(clienteDto.getShared());
         clienteBySharedKey.ifPresent(c -> {
             if (!c.getId().equals(clienteDto.getId())) {
-                String mensajeError = ExceptionMessages.ERROR201.getMensajeConParametros(clienteDto.getSharedKey());
+                String mensajeError = ExceptionMessages.ERROR201.getMensajeConParametros(clienteDto.getShared());
                 log.warm(mensajeError);
                 throw new ResponseStatusException(HttpStatus.CONFLICT, mensajeError);
             }
