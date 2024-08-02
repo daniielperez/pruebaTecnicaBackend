@@ -3,6 +3,8 @@ package com.tecnica.controller;
 import com.tecnica.dto.ClienteDto;
 import com.tecnica.entity.Cliente;
 import com.tecnica.services.ClienteService;
+import com.tecnica.utils.GenericResponseDTO;
+import com.tecnica.utils.UtilConstantes;
 import jakarta.validation.Valid;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +25,25 @@ public class ClienteController {
     ClienteService clienteService;
 
     @GetMapping("/listar")
-    public ResponseEntity<List<ClienteDto>> listar() {
-        return new ResponseEntity<>(clienteService.obtenerTodosLosCliente(), HttpStatus.OK);
+    public ResponseEntity<GenericResponseDTO> listar() {
+        GenericResponseDTO genericResponse = new GenericResponseDTO(
+                clienteService.obtenerTodosLosCliente(),
+                true,
+                UtilConstantes.RESPONSE_FIND,
+                HttpStatus.OK,
+                UtilConstantes.TITTLE_FIND);
+        return new ResponseEntity<GenericResponseDTO>(genericResponse, HttpStatus.OK);
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<ClienteDto> buscarPorSharedKey(@RequestParam String sharedKey) {
-        return new ResponseEntity<>(clienteService.obtenetClientePorSharedKey(sharedKey), HttpStatus.OK);
+    public ResponseEntity<GenericResponseDTO> buscarPorSharedKey(@RequestParam String sharedKey) {
+        GenericResponseDTO genericResponse = new GenericResponseDTO(
+                clienteService.obtenetClientePorSharedKey(sharedKey),
+                true,
+                UtilConstantes.RESPONSE_FIND,
+                HttpStatus.OK,
+                UtilConstantes.TITTLE_FIND);
+        return new ResponseEntity<GenericResponseDTO>(genericResponse, HttpStatus.OK);
     }
 
     @GetMapping("/buscarMail")
@@ -38,13 +52,25 @@ public class ClienteController {
     }
 
     @PostMapping("/crear")
-    public ResponseEntity<ClienteDto> CrearCliente(@Valid @RequestBody ClienteDto cli){
-        return new ResponseEntity<>(clienteService.guardarCliente(cli), HttpStatus.OK);
+    public ResponseEntity<GenericResponseDTO> CrearCliente(@Valid @RequestBody ClienteDto cli){
+        GenericResponseDTO genericResponse = new GenericResponseDTO(
+                clienteService.guardarCliente(cli),
+                true,
+                UtilConstantes.RESPONSE_CREATED,
+                HttpStatus.OK,
+                UtilConstantes.TITTLE_CREATED);
+        return new ResponseEntity<GenericResponseDTO>(genericResponse, HttpStatus.OK);
     }
 
     @PutMapping("/editar")
-    public ResponseEntity<ClienteDto> EditarCliente(@Valid @RequestBody ClienteDto cli){
-        return new ResponseEntity<>(clienteService.actualizarCliente(cli), HttpStatus.OK);
+    public ResponseEntity<GenericResponseDTO> EditarCliente(@Valid @RequestBody ClienteDto cli){
+        GenericResponseDTO genericResponse = new GenericResponseDTO(
+                clienteService.actualizarCliente(cli),
+                true,
+                UtilConstantes.RESPONSE_UPDATE,
+                HttpStatus.OK,
+                UtilConstantes.TITTLE_UPDATE);
+        return new ResponseEntity<>(genericResponse, HttpStatus.OK);
     }
 
 }
